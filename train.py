@@ -185,49 +185,6 @@ for author in authors:
                 dev_summary_writer.add_summary(summaries, step)
 
 
-            def web( cnn, sess, vocab_processor):
-                app = Flask(__name__)
-
-                @app.route("/")
-                def hello():
-                    return "Hello World!"
-                @app.route("/score", methods=['GET','POST'])
-                def return_score():
-                    input = request.args.get('text')
-                    input = [input]
-
-                    input = [data_helpers.clean_str(sent) for sent in input]
-
-                    x = np.array(list(vocab_processor.fit_transform(input)))
-                    return str(dev_step(x)[0])
-
-
-
-                def dev_step(x_batch):
-                    """
-                    Evaluates model on a dev set
-                    """
-
-
-
-                    y = np.array([1], dtype=np.float32)
-                    feed_dict = {
-                        cnn.input_x: x_batch,
-                        cnn.input_y: y,
-                        cnn.dropout_keep_prob: 1.0
-                    }
-                    step, summaries, loss, accuracy, scores = sess.run(
-                        [global_step, dev_summary_op, cnn.loss, cnn.accuracy, cnn.scores],
-                        feed_dict)
-
-                    return scores[0]
-
-                app.run()
-
-
-
-
-
             # Generate batches
             batches = data_helpers.batch_iter(
                 list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
